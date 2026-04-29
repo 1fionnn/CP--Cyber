@@ -2,42 +2,33 @@ name: OWASP ZAP Scan
 
 on:
 push:
-branches: [ "main" ]
-pull_request:
 
 jobs:
 zap_scan:
 runs-on: ubuntu-latest
 
-```
 steps:
-- name: Checkout do código
-  uses: actions/checkout@v4
+  - name: Checkout
+    uses: actions/checkout@v4
 
-- name: Subir aplicação local
-  run: |
-    docker run -d -p 8080:80 --name app-test nginx
+  - name: Subir app
+    run: docker run -d -p 8080:80 nginx
 
-- name: Esperar aplicação
-  run: sleep 15
+  - name: Esperar app
+    run: sleep 15
 
-- name: Rodar OWASP ZAP Baseline Scan
-  run: |
-    docker run --rm \
-      -v $(pwd):/zap/wrk/:rw \
-      owasp/zap2docker-stable zap-baseline.py \
-      -t http://host.docker.internal:8080 \
-      -r zap-report.html \
-      -x zap-report.xml \
-      -J zap-report.json \
-      -m 1
+  - name: Rodar ZAP
+    run: |
+      docker run --network="host" --rm \
+        -v $(pwd):/zap/wrk/:rw \
+        owasp/zap2docker-stable zap-baseline.py \
+        -t http://localhost:8080 \
+        -r zap-report.html \
+        -m 1
 
-- name: Salvar relatório ZAP
-  uses: actions/upload-artifact@v4
-  with:
-    name: zap-report
-    path: |
-      zap-report.html
-      zap-report.xml
-      zap-report.json
+  - name: Upload relatório
+    uses: actions/upload-artifact@v4
+    with:
+      name: zap-report
+      path: zap-report.html
 ```
