@@ -7,6 +7,7 @@ jobs:
 zap_scan:
 runs-on: ubuntu-latest
 
+```
 steps:
   - name: Checkout
     uses: actions/checkout@v4
@@ -19,12 +20,7 @@ steps:
 
   - name: Rodar ZAP
     run: |
-      docker run --network="host" --rm \
-        -v $(pwd):/zap/wrk/:rw \
-        owasp/zap2docker-stable zap-baseline.py \
-        -t http://localhost:8080 \
-        -r zap-report.html \
-        -m 1
+      docker run --network=host --rm -v $(pwd):/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://localhost:8080 -r zap-report.html -m 1
 
   - name: Upload relatório
     uses: actions/upload-artifact@v4
